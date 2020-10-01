@@ -31,7 +31,7 @@ def sendPayload(postObj):
 
 
 @app.route("/check")
-def test():
+def checkPiazza():
     client = pymongo.MongoClient(pizzapizzasecret.dbsecret)
     db = client.get_database('piazza-posts')
     table = db.posts
