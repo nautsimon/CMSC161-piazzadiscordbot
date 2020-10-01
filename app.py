@@ -5,15 +5,10 @@ from piazza_api import network as net
 import re
 import pymongo
 import time
-#shhhhhhhhh
 import requests
 app = Flask(__name__)
 
 def sendPayload(postObj):
-  # print(postObj['history'][0]['subject'])
-  # print("https://piazza.com/class/keke5ooeun21ot?cid="  + str(postObj['nr']))
-  # print(re.sub('<[^<]+?>', '', str(postObj['history'][0]['content'])) + "...")
-  # print(postObj['unique_views'])
     data = {}
     data["content"] = "New post: " + postObj['created']
     data["username"] = "CMSC PIAZZA BOT"
@@ -40,9 +35,9 @@ def test():
     client = pymongo.MongoClient(pizzapizzasecret.dbsecret)
     db = client.get_database('piazza-posts')
     table = db.posts
-    #print("table", table)
     existingPosts = []
     query = table.find()
+    print(query)
     output = {}
     i = 0
     for x in query:
@@ -50,7 +45,7 @@ def test():
         output[i].pop('_id')
         existingPosts.append(output[i]['ID'] )
         i += 1
-    #print(existingPosts)
+    print(existingPosts)
     p = Piazza()
     p.user_login(pizzapizzasecret.email, pizzapizzasecret.password)
     ds = p.network(pizzapizzasecret.net)
@@ -59,23 +54,22 @@ def test():
     for post in posts:
         #print("post", post)
         if post['history'][0]['subject'] not in existingPosts:
-            sendPayload(post)
+            payload = post['history'][0]['subject']
+            print(payload)
             queryObject = {
-                'ID': post['history'][0]['subject'],
+                'ID': payload,
             }
-            query = db.table.insert_one(queryObject)
-  # ds_posts = ds.get_filtered_feed(net.UnreadFilter())
-  # if len(ds_posts['feed']) > 0:
-  #   print("length", len(ds_posts['feed']))
-  #   for x in range(0, len(ds_posts['feed'])):
-  #     print(ds_posts['feed'][x]['subject'])
+            queryMongo = table.insert_one(queryObject)
+            sendPayload(post)
 
+        else:
+            print("piazza channel up to date")
     return "success"
 
 
 @app.route('/')
 def rootAcc():
-    return 'yes, cmsc is misspelled h̸̨̨̧̳̯̻͕̩̙̟̯̐́̒͂̂͝ē̸̢̡̧̡̡̡̧̛̛̠̲̥̫̘͈̦̭̺͚̠̹̲̟̭͈͎̫̱̤͙̘̙̘͎̼̱͓͍͈̯̻̞̹͍̻̦͖̤̪̞̗̠͕̖͎̠̙̖̲͉͓͕̖͓̭̦̙̝̟̣̖̭͈͚̱̯̜̲̥͈̯̙̻͒̀̏̄̋͌͊̇̋̈́͑͆̌̈́̋̽̃̍͌́͑̓̋̀̊̈́̒̃̇̾̒͆̈́̓̋̇̇͂͆̒̏̿̓̑̀̽̂͐̌̕̕̚͘̕ͅl̸̢̡̛̩͇̦̠͇̤͖̬̝͙̰̟̱̺̯͓̪̤͖̩̞̩͚̠̫͓̠̥̎̾̔̐̌͗̋̀͛̊̆̓̀̽͊̈́͗͌̄͋̀́̈͌͐̆̈͛͑̽̃̊̆̓̅̍̃́́̿́̾͂̿́̀̀͆̾̓̏͛͘͘̕͝͠͝͝͠l̴̨̨̨̨̧̡̢̢̢̨̧̛̗̥̙̮̫͎̼̮̤͕̠̹̙͇̜͕̰̰̲͇̤̗̙̜͔̻͇̖̦͉̻̪̝̬̭̯̲̻̹̱̤̼̪̲̻̩͇͚͕̭̼͊̌̃͂͑́̚͜͜͜ͅͅͅơ̶̧̢̨̧̡̘͓̤̼̫͎̣̞͕̯͇͕̹̬͉̝͚̮͖͍̖̖̪̣͙̱̰̾̽̏͛̐̒͆̄̿̆͒͊̋̃̆̏̆̈́̈́̈̀̏̈́̾͌͑̉͐̍͋̅̈́̐͐̈́͗͗̓̀̈͊͋̈́̎̄͗̕̚͝͝͝͝͝͝͝͠'
+    return 'h̸̨̨̧̳̯̻͕̩̙̟̯̐́̒͂̂͝ē̸̢̡̧̡̡̡̧̛̛̠̲̥̫̘͈̦̭̺͚̠̹̲̟̭͈͎̫̱̤͙̘̙̘͎̼̱͓͍͈̯̻̞̹͍̻̦͖̤̪̞̗̠͕̖͎̠̙̖̲͉͓͕̖͓̭̦̙̝̟̣̖̭͈͚̱̯̜̲̥͈̯̙̻͒̀̏̄̋͌͊̇̋̈́͑͆̌̈́̋̽̃̍͌́͑̓̋̀̊̈́̒̃̇̾̒͆̈́̓̋̇̇͂͆̒̏̿̓̑̀̽̂͐̌̕̕̚͘̕ͅl̸̢̡̛̩͇̦̠͇̤͖̬̝͙̰̟̱̺̯͓̪̤͖̩̞̩͚̠̫͓̠̥̎̾̔̐̌͗̋̀͛̊̆̓̀̽͊̈́͗͌̄͋̀́̈͌͐̆̈͛͑̽̃̊̆̓̅̍̃́́̿́̾͂̿́̀̀͆̾̓̏͛͘͘̕͝͠͝͝͠l̴̨̨̨̨̧̡̢̢̢̨̧̛̗̥̙̮̫͎̼̮̤͕̠̹̙͇̜͕̰̰̲͇̤̗̙̜͔̻͇̖̦͉̻̪̝̬̭̯̲̻̹̱̤̼̪̲̻̩͇͚͕̭̼͊̌̃͂͑́̚͜͜͜ͅͅͅơ̶̧̢̨̧̡̘͓̤̼̫͎̣̞͕̯͇͕̹̬͉̝͚̮͖͍̖̖̪̣͙̱̰̾̽̏͛̐̒͆̄̿̆͒͊̋̃̆̏̆̈́̈́̈̀̏̈́̾͌͑̉͐̍͋̅̈́̐͐̈́͗͗̓̀̈͊͋̈́̎̄͗̕̚͝͝͝͝͝͝͝͠ yes, cmsc is misspelled '
 
 
 
