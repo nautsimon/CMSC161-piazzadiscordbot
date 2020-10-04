@@ -6,6 +6,7 @@ import re
 import pymongo
 import time
 import requests
+import html
 app = Flask(__name__)
 
 def sendPayload(postObj):
@@ -14,7 +15,7 @@ def sendPayload(postObj):
     data["username"] = "CMSC PIAZZA BOT"
     data["embeds"] = []
     embed = {}
-    embed["description"] = re.sub('<[^<]+?>', '', str(postObj['history'][0]['content']))
+    embed["description"] = html.unescape(re.sub('<[^<]+?>', '', str(postObj['history'][0]['content'])))
     embed["title"] = postObj['history'][0]['subject']
     embed["url"] = "https://piazza.com/class/keke5ooeun21ot?cid="  + str(postObj['nr'])
     embed["color"] = 0XA5E0FE
