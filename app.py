@@ -9,14 +9,14 @@ import requests
 import html
 app = Flask(__name__)
 
-def sendPayload(postObj):
+def sendPayload(postObj, theTitle):
     data = {}
     data["content"] = "New post: " + postObj['created']
     data["username"] = "CMSC PIAZZA BOT"
     data["embeds"] = []
     embed = {}
     embed["description"] = html.unescape(re.sub('<[^<]+?>', '', str(postObj['history'][0]['content'])))
-    embed["title"] = postObj['history'][0]['subject']
+    embed["title"] = theTitle
     embed["url"] = "https://piazza.com/class/keke5ooeun21ot?cid="  + str(postObj['nr'])
     embed["color"] = 0XA5E0FE
     data["embeds"].append(embed)
@@ -53,15 +53,14 @@ def checkPiazza():
     #print("ds", ds.iter_all_posts())
     posts = ds.iter_all_posts()
     for post in posts:
-        #print("post", post)
-        if post['history'][0]['subject'] not in existingPosts:
-            payload = post['history'][0]['subject']
-            print(payload)
+        theTitle = html.unescape(re.sub('<[^<]+?>', '', str(post['history'][0]['subject'])))
+        if theTitle not in existingPosts:
+            print(theTitle)
             queryObject = {
-                'ID': payload,
+                'ID': theTitle,
             }
             queryMongo = table.insert_one(queryObject)
-            sendPayload(post)
+            sendPayload(post, theTitle)
 
         else:
             print("piazza channel up to date")
@@ -75,7 +74,7 @@ def rootAcc():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0',  port=8081)
 
 
 
